@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>beyaz masa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sikayetolustur.css') }}">
+</head>
+<body>
+    
+    <header>
+        <h1>SULTANBEYLİ BELEDİYESİ</h1>
+        <h2>BAŞVURU OLUŞTUR</h2>
+        <nav>
+             <a href="/">← Ana Sayfaya Dön</a>
+        </nav> 
+    </header>
+
+    <div style="width: 50%; margin: 30px auto;">
+        <!-- Dosya yükleyebilmek için enctype="multipart/form-data" zorunludur -->
+        <form id="basvuruFormu" enctype="multipart/form-data">
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="ad" placeholder="AD:" required style="width: 100%; padding: 10px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="soyad" placeholder="SOYAD:" required style="width: 100%; padding: 10px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="tc" placeholder="TC KİMLİK NO:" required style="width: 100%; padding: 10px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="dogum_tarihi" placeholder="DOĞUM TARİHİ:" required onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" style="width: 100%; padding: 10px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="telefon" placeholder="TELEFON:" required style="width: 100%; padding: 10px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <textarea name="adres" placeholder="ADRES:" rows="3" required style="width: 100%; padding: 10px; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <textarea name="konu" placeholder="ŞİKAYET METNİ / KONU:" rows="4" required style="width: 100%; padding: 10px; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">RESİM VEYA DOSYA EKLE:</label>
+                <input type="file" name="dosya" style="width: 100%; padding: 5px;">
+            </div>
+
+            <!-- Doğrulama Kodu Alanı Yan Yana -->
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <img id="captchaImg" src="/captcha-image" alt="Doğrulama Kodu" style="border: 1px solid #ccc; cursor: pointer; height: 45px;" title="Yenilemek için tıklayın" onclick="yenileCaptcha()">
+                <button type="button" onclick="yenileCaptcha()" style="padding: 12px 15px; background-color: #666; color: white; border: none; cursor: pointer;">Yenile</button>
+                <input type="text" name="captcha_input" placeholder="KODU GİRİNİZ" required style="flex: 1; padding: 12px; text-transform: uppercase;">
+            </div>
+
+            <div>
+                <button type="submit" style="padding: 10px 20px; background-color: #265fc7; color: white; border: none; cursor: pointer;">Başvuru Yap</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="mesaj-alani" style="text-align: center; color: #265fc7; margin-top: 20px; font-weight: bold; font-size: 18px;"></div>
+
+    <script>
+        function yenileCaptcha() {
+            const img = document.getElementById('captchaImg');
+            img.src = '/captcha-image?' + new Date().getTime();
+        }
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const mesajDiv = document.getElementById('mesaj-alani');
+            
+            mesajDiv.style.color = "#265fc7";
+            mesajDiv.innerText = "Başvurunuz alınıyor, lütfen bekleyin...";
+
+            fetch('/ekle', {
+                method: 'POST',
+                body: formData
+            }).then(async response => {
+                const sonucMetni = await response.text();
+
+                if (response.ok && sonucMetni.trim() === "Başarılı") {
+                    setTimeout(function() {
+                        mesajDiv.style.color = "green";
+                        mesajDiv.innerText = "Başvurunuz başarıyla alındı!";
+                        form.reset();
+                        yenileCaptcha();
+                    }, 500);
+                } else {
+                    mesajDiv.style.color = "red";
+                    mesajDiv.innerText = sonucMetni.includes("<!DOCTYPE html>") ? "Veritabanı veya sunucu hatası oluştu!" : sonucMetni;
+                    yenileCaptcha();
+                }
+            }).catch(error => {
+                mesajDiv.style.color = "red";
+                mesajDiv.innerText = "Bağlantı hatası oluştu!";
+                yenileCaptcha();
+            });
+        });
+    </script>
+    
+</body>
+</html>

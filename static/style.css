@@ -1,0 +1,138 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: rgb(154, 207, 254);
+}
+
+header {
+    background-color: #265fc7;
+    text-align: center;
+    color: azure;
+    margin: 0%;
+    padding: 20px 0px;
+}
+
+header h1 {
+    margin-bottom: 10px;
+}
+
+/* Personel Giriş Butonu */
+
+ header a {
+
+text-align: left;
+
+display: block;
+
+color: rgb(202, 241, 255);
+
+text-decoration: none;
+
+margin: 10px 10px 10px 10px;
+
+background-color: rgb(57, 32, 2);
+
+width: 130px;
+
+border: none;
+
+outline: none;
+
+border-radius: 30px 30px 30px 30px;
+
+ font-size: 15px;
+
+transition: 300ms all;
+
+ }
+ h6{
+   text-align: right;
+margin-top:-120px;
+font-size: 14px;
+color: rgb(117, 90, 90);
+text-align: center;
+ } h5{
+   text-align: right;
+
+font-size: 14px;
+color: rgb(117, 90, 90);
+text-align: center;
+ }h4{
+   text-align: right;
+
+font-size: 14px;
+color: rgb(117, 90, 90);
+text-align: center;
+ }
+
+
+
+
+header a:hover {
+
+background-color: #265ec7b5;}
+
+/* Tüm içeriği ortalayan ana alan */
+/* Tüm içeriği yukarı taşıyan alan */
+.hero {
+    display: flex;
+    flex-direction: column; 
+    justify-content: flex-start; /* İçeriği yukarı hizalar */
+    align-items: center 30px;     
+    padding-top: 120px; /* Header'dan ne kadar aşağıda olmasını istiyorsan ayarlayabilirsin */
+    height: calc(100vh - 100px); 
+    gap: 0px; 
+}
+
+/* Butonları yan yana tutacak kapsayıcı alan */
+.butonlar-alani {
+    display: flex;
+    flex-direction: row; /* YAN YANA DURMASINI SAĞLAR */
+    justify-content: center;
+    align-items: center;
+    gap: 30px; /* İki buton arasındaki yatay mesafe */
+    width: 100%;
+}
+
+/* "Başvuru Sorgula" ve "Şikayet Oluştur" Butonlarının Ortak Tasarımı */
+.hero a, .sorgulama-alani a {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(191, 232, 255);
+    text-decoration: none;
+    background-color: #265fc7;
+    border-radius: 10px;
+    outline: none;
+   width: 340px;   /* Genişliği artırıldı (Eski: 280px) */
+    height: 150px;  /* Yüksekliği artırıldı (Eski: 120px) */
+    font-size: 28px; /* Yazı boyutu büyütüldü (Eski: 24px) */
+    font-weight: bold;
+    transition: 300ms all;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.hero a:hover, .sorgulama-alani a:hover {
+    background-color: #265ec7b5;
+    transform: translateY(-3px); /* Hover efekti */
+}
+
+.gorsel-alani {
+    text-align: center;      
+    margin-bottom: 10px;     
+}
+
+.gorsel-alani img {
+    max-width: 100%;         
+    height: auto;            
+    border-radius: 10px;     
+}

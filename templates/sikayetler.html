@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Başvuru Listesi - Beyaz Masa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sikayetler.css') }}">
+    <style>
+        .filtre-kapsayici {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        .filtre-btn {
+            padding: 15px 25px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.3s, transform 0.2s;
+            text-align: center;
+            min-width: 140px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .filtre-btn:hover { 
+            opacity: 0.9; 
+            transform: translateY(-2px);
+        }
+        .filtre-baslik {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .filtre-sayi {
+            display: block;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .btn-tum { background-color: #5bc0de; } 
+        .btn-bekliyor { background-color: #f0ad4e; } 
+        .btn-donus { background-color: #5cb85c; } 
+        .btn-red { background-color: #d9534f; } 
+
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        .styled-table thead tr {
+            background-color: #265fc7;
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+    </style>
+</head>
+<body>
+
+    <header style="text-align: center; background-color: #265fc7; padding: 20px; color: white;">
+        <h1>SULTANBEYLİ BELEDİYESİ</h1>
+        <nav>
+             <a href="/" style="color: white; text-decoration: none;">← Ana Sayfaya Dön</a>
+        </nav> 
+    </header>
+
+    <!-- Üstteki Büyük Sayılı Renkli Kutular -->
+    <div class="filtre-kapsayici">
+        <a href="/sikayetler" class="filtre-btn btn-tum">
+            <span class="filtre-baslik">Tümü</span>
+            <span class="filtre-sayi">{{ toplam_sayi }}</span>
+        </a>
+        <a href="/sikayetler?durum=Bekliyor" class="filtre-btn btn-bekliyor">
+            <span class="filtre-baslik">Bekliyor</span>
+            <span class="filtre-sayi">{{ bekliyor_sayisi }}</span>
+        </a>
+        <a href="/sikayetler?durum=Dönüş Yapıldı" class="filtre-btn btn-donus">
+            <span class="filtre-baslik">Dönüş Yapıldı</span>
+            <span class="filtre-sayi">{{ donus_sayisi }}</span>
+        </a>
+        <a href="/sikayetler?durum=Reddedildi" class="filtre-btn btn-red">
+            <span class="filtre-baslik">Reddedildi</span>
+            <span class="filtre-sayi">{{ red_sayisi }}</span>
+        </a>
+    </div>
+
+    <!-- Başvuru Tablosu -->
+    <div style="width: 95%; margin: 30px auto; overflow-x: auto;">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ad Soyad</th>
+                    <th>TC Kimlik</th>
+                    <th>Telefon</th>
+                    <th>Adres</th>
+                    <th>Konu</th>
+                    <th>Dosya</th>
+                    <th>Durumu Güncelle</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for kayit in sonuclar %}
+                <tr>
+                    <td>{{ kayit[0] }}</td> <!-- TalepID -->
+                    <td>{{ kayit[2] }}</td> <!-- AdSoyad -->
+                    <td>{{ kayit[1] }}</td> <!-- VatandasTc -->
+                    <td>{{ kayit[3] }}</td> <!-- Telefon -->
+                    <td>{{ kayit[4] }}</td> <!-- Adres -->
+                    <td>{{ kayit[5] }}</td> <!-- Sikayet / Konu -->
+                    <td>
+                        {% if kayit[6] %}
+                            <a href="{{ url_for('static', filename='uploads/' + kayit[6]) }}" target="_blank">Dosyayı Gör</a>
+                        {% else %}
+                            Dosya Yok
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="/durumguncelle/{{ kayit[0] }}" method="POST" style="display: flex; gap: 5px; align-items: center;">
+                            <select name="sonuc" style="padding: 5px;">
+                                <option value="Bekliyor" {% if kayit[7] == 'Bekliyor' %}selected{% endif %}>Bekliyor</option>
+                                <option value="Dönüş Yapıldı" {% if kayit[7] == 'Dönüş Yapıldı' %}selected{% endif %}>Dönüş Yapıldı</option>
+                                <option value="Reddedildi" {% if kayit[7] == 'Reddedildi' %}selected{% endif %}>Reddedildi</option>
+                            </select>
+                            <button type="submit" style="padding: 5px 10px; background-color: #265fc7; color: white; border: none; cursor: pointer;">OK</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/sil/{{ kayit[0] }}" method="POST" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');" style="background-color: #d9534f; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer;">Sil</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

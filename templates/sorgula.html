@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Başvuru Sorgula - Beyaz Masa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sikayetler.css') }}">
+    <style>
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px auto;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 90%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        .styled-table thead tr {
+            background-color: #265fc7;
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+    </style>
+</head>
+<body>
+
+    <header style="text-align: center; background-color: #265fc7; padding: 20px; color: white;">
+        <h1>SULTANBEYLİ BELEDİYESİ</h1>
+        <h2>BAŞVURU SORGULAMA</h2>
+        <nav>
+             <a href="/" style="color: white; text-decoration: none;">← Ana Sayfaya Dön</a>
+        </nav> 
+    </header>
+
+    <div style="width: 40%; margin: 30px auto; text-align: center;">
+        <form method="POST" style="display: flex; gap: 10px; justify-content: center;">
+            <input type="text" name="tc" placeholder="TC Kimlik No Giriniz" value="{{ aranan_tc if aranan_tc else '' }}" required style="padding: 10px; width: 60%; border: 1px solid #ccc; border-radius: 4px;">
+            <button type="submit" style="padding: 10px 20px; background-color: #265fc7; color: white; border: none; border-radius: 4px; cursor: pointer;">Sorgula</button>
+        </form>
+    </div>
+
+    {% if aranan_tc is not none %}
+        <div style="width: 95%; margin: 30px auto; overflow-x: auto;">
+            {% if sonuclar %}
+                <h3 style="text-align: center; color: #333;">"{{ aranan_tc }}" TC Numarasına Ait Başvurular</h3>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Ad Soyad</th>
+                            <th>TC Kimlik</th>
+                            <th>Telefon</th>
+                            <th>Adres</th>
+                            <th>Şikayet / Konu</th>
+                            <th>Dosya</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kayit in sonuclar %}
+                        <tr>
+                            <td>{{ kayit[0] }}</td> <!-- AdSoyad -->
+                            <td>{{ kayit[1] }}</td> <!-- VatandasTc -->
+                            <td>{{ kayit[2] }}</td> <!-- Telefon -->
+                            <td>{{ kayit[3] }}</td> <!-- Adres -->
+                            <td>{{ kayit[4] }}</td> <!-- Sikayet -->
+                            <td>
+                                {% if kayit[5] %}
+                                    <a href="{{ url_for('static', filename='uploads/' + kayit[5]) }}" target="_blank">Dosyayı Gör</a>
+                                {% else %}
+                                    Dosya Yok
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ kayit[6] }}</strong></td> <!-- Durum -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="text-align: center; color: #d9534f; font-weight: bold; font-size: 18px;">Bu TC Kimlik numarasına ait kayıt bulunamadı.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</body>
+</html>

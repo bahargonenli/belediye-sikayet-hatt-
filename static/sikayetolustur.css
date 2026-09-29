@@ -1,0 +1,76 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: aliceblue;
+}
+
+header {
+    background-color: #265fc7;
+    text-align: center;
+    color: azure;
+    margin: 0;
+    padding: 20px 0;
+}
+header a{
+    color: antiquewhite;
+    width: 10px;
+}
+body::before {
+    content: "";
+    position: fixed;
+    top:190px; /* Resmi üstten aşağı kaydıran kısım (istediğin gibi artırabilirsin) */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 50px);
+    background-image: url('../static/olllll.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1; /* İçeriklerin arkasında kalmasını sağlar */
+}
+h2 {
+    text-align: center;
+    margin: 50px 260px 0 260px;
+    background-color: #265fc7;
+    color: aliceblue;
+    padding: 10px 0;
+}
+
+h3, h4, h5, h6 {
+    text-align: center;
+    background-color:#265fc7;
+    margin: 0 260px;
+    padding: 10px 0;
+}
+
+/* Beyaz kutuların (inputların) mavi alan içinde aşağı kaymasını sağlar */
+h3 input, h4 input, h5 input, h6 input {
+    display: inline-block;
+    padding: 15px 130px;
+    margin-top: 20px; /* Beyaz kutuları üstten aşağı kaydırır (değeri artırıp azaltabilirsin) */
+    box-sizing: border-box;
+}
+
+div h4 {
+    text-align: center;
+    background-color: #265fc7;
+    cursor: pointer;
+    margin: 0 260px;
+    padding: 10px 0;
+    transition: 300ms all;
+    font-size: 30px;
+    color: aliceblue;
+}
+
+div h4:hover {
+    background-color: #42aaffb5;
+}
+
+p {
+    color: aliceblue;
+}

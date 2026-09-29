@@ -1,0 +1,94 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    /* Resmin yolunu belirtin */
+    background-image: url('../static/belediye.jpg');
+    background-size: cover;          /* Ekranı tam kaplar */
+    background-position: center;     /* Resmi ortalar */
+    background-repeat: no-repeat;    /* Resmin tekrar etmesini engeller */
+    background-attachment: fixed;    /* Sayfa aşağı kayınca resim sabit kalır */
+}
+
+header {
+    background-color: #265fc7;
+    height: 123px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+header a{
+    color: antiquewhite;
+   font-size: 20px;
+   justify-content: center;
+}
+h1 {
+    text-align: center;
+    color: aliceblue;
+    margin: 20px 0; /* Büyük boşluk yerine kontrollü boşluk */
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+}
+
+nav h2 {
+    text-align: center;
+    padding: 1px;
+    margin: 1px ;
+}
+
+nav h4 {
+    background-color: #265fc7;
+    text-align: center;
+    color: rgba(242, 240, 255, 0.886);
+    margin: 0;
+    padding: 20px 40px;
+}
+/* İstatistik Kutuları Tasarımı */
+.istatistikler-alani {
+    width: 90%;
+    margin: 20px auto;
+    display: flex;
+    gap: 15px;
+}
+.kart {
+    flex: 1;
+    background: #3498db; /* Mavi (Toplam Başvuru) */
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    color: white;
+}
+.kart.bekliyor { 
+    background: #f1c40f; /* Sarı (Bekleyen) */
+    color: #333; 
+} 
+.kart.donus { 
+    background: #2ecc71; /* Yeşil (Dönüş Yapıldı) */
+    color: white; 
+}    
+.kart.red { 
+    background: #e74c3c; /* Kırmızı (Reddedildi) */
+    color: white; 
+}      
+
+.kart h4 {
+    margin: 0;
+    font-size: 14px;
+}
+.kart p {
+    margin: 5px 0 0 0;
+    font-size: 22px;
+    font-weight: bold;
+}

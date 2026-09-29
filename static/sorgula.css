@@ -1,0 +1,45 @@
+*  {
+              margin:0;
+              padding:0;
+              box-sizing:border-box;
+               
+
+}
+
+
+body {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    height: 100vh;
+}
+
+/* Resmi arka plan yerine esnek bir katman olarak eklersek asla kaybolmaz ve istediğimiz gibi konumlanır */
+body::before {
+    content: "";
+    position: fixed;
+    top:190px; /* Resmi üstten aşağı kaydıran kısım (istediğin gibi artırabilirsin) */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 50px);
+    background-image: url('../static/olllll.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1; /* İçeriklerin arkasında kalmasını sağlar */
+}
+header  {  background-color: #265fc7;
+text-align: center;
+color: azure;
+margin: 0%;
+padding: 20px 0px;
+}
+
+nav h4
+ {  background-color: #265fc7;
+text-align: center;
+color: antiquewhite;
+margin: 0%;
+padding: 100px 0px; 
+}

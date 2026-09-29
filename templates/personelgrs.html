@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>beyaz masa</title>
+    <!-- HTML'den doğrudan static klasörüne çıkış yolu -->
+    <link rel="stylesheet" href="../static/personelgrs.css">
+</head>
+<body>
+    
+    <header>
+<h1>PERSONEL GİRİŞ</h1>
+
+
+<nav>
+
+<a href="/">← Ana Sayfaya Dön</a>
+</nav>
+    </header>
+  
+<form id="girisFormu">
+    <!-- TC ve SİFRE inputlarına id ekledik -->
+    <h3><input type="text" id="tc" placeholder="PERSONEL TC:" required></h3>
+    <h4><input type="password" id="sifre" placeholder="PERSONEL ŞİFRESİ:" required></h4>
+    
+    <div> 
+        <h5>
+            <button type="submit">GİRİŞ YAP</button>
+        </h5>
+    </div>
+</form>
+
+<div id="mesaj-alani" style="text-align: center; color: #265fc7; margin-top: 20px; font-weight: bold;"></div>
+<script>
+    document.getElementById('girisFormu').addEventListener('submit', function(event) {
+        event.preventDefault(); 
+        
+        const tc = document.getElementById('tc').value;
+        const sifre = document.getElementById('sifre').value;
+        const mesajDiv = document.getElementById('mesaj-alani');
+
+        if (tc === "12345678900" && sifre === "bahar123") {
+            mesajDiv.style.color = "#265fc7";
+            mesajDiv.innerText = "Giriş başarıyla tamamlandı, yönlendiriliyorsunuz...";
+            
+            setTimeout(function() {
+                // Flask rotasına yönlendiriyoruz
+                window.location.href = "/sikayetler"; 
+            }, 1500);
+        } else {
+            mesajDiv.style.color = "red";
+            mesajDiv.innerText = "Hatalı TC veya Şifre!";
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Sanal Ortamlar (Virtual Environments)
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Ortam Değişkenleri ve Gizli Dosyalar
+.env
+.env.*
+
+# IDE ve Editör Dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# İşletim Sistemi Dosyaları
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Yüklenen Kullanıcı Dosyaları (Klasörün kalması için .gitkeep hariç tutulur)
+static/uploads/*
+!static/uploads/.gitkeep

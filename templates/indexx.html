@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>beyaz masa</title>
+    <!-- Statik dosyalar (CSS, resimler) için url_for kullanımı -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="gorsel-alani">
+            <img src="{{ url_for('static', filename='foto04_05_2015_163810_489.jpg') }}" alt="Belediye Logo" style="width: 200px; height: auto;">
+        </div>
+        <h2>DESTEK HATTI</h2>
+        
+        <!-- Flask rotası -->
+        <a href="{{ url_for('personel_giris') }}" class="giris-butonu">‎ ‎ PERSONEL GİRİŞ</a>
+
+        
+    </header>
+
+    <div class="hero">
+        <div class="butonlar-alani">
+            <a href="{{ url_for('basvuru_sorgula') }}">BAŞVURU SORGULA</a>
+            <a href="{{ url_for('sikayet_olustur') }}">BAŞVURU OLUŞTUR</a>
+        </div>
+    </div>
+    <nav>
+            <h6>SİMER Hattı:444 98 92  ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎Faks: 0216 398 48 84
+</h6>
+<h5> ‎ ‎ ‎ ‎  ‎ ‎ ‎ ‎  ‎ ‎ ‎ ‎ belediye@sultanbeyli.bel.tr     ‎ ‎ ‎ ‎ ‎ ‎  ‎ ‎ 
+sultanbeylibelediyesi@hs01.kep.tr </h5>
+<h4>Abdurrahmangazi Mahallesi, Belediye Caddesi No: 4 Sultanbeyli, İstanbul – Türkiye</h4>        </nav>
+</body>
+</html>
