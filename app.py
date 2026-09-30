@@ -1,11 +1,16 @@
 import os
 import random
 import string
+import sqlite3
 from io import BytesIO
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFont
-import pyodbc
+
+try:
+    import pyodbc
+except ImportError:
+    pyodbc = None
 
 # Proje klasörünün içindeki templates klasörünü gösterir
 template_dir = os.path.abspath('templates')
@@ -21,12 +26,25 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# --- MS SQL SERVER BAĞLANTI FONKSİYONU ---
+# --- VERİTABANI BAĞLANTI FONKSİYONU (MSSQL & Render/SQLite Otomatik Geçiş) ---
+USE_SQLITE = False
+
 def get_db_connection():
-    server = '.\\SQLEXPRESS'  
-    database = 'BeyazMasaDB'  
-    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
-    conn = pyodbc.connect(conn_str)
+    global USE_SQLITE
+    if not USE_SQLITE and pyodbc is not None:
+        try:
+            server = '.\\SQLEXPRESS'  
+            database = 'BeyazMasaDB'  
+            conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
+            conn = pyodbc.connect(conn_str, timeout=2)
+            return conn
+        except Exception as e:
+            print(f"MS SQL Server bağlantısı kurulamadı ({e}). SQLite veritabanına geçiliyor...")
+            USE_SQLITE = True
+
+    # Render / Linux veya MS SQL Server olmayan durumlar için SQLite
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'beyaz_masa.db')
+    conn = sqlite3.connect(db_path)
     return conn
 
 # Veritabanını ve Eksik Sütunları Otomatik Kontrol Etme / Oluşturma
@@ -35,54 +53,85 @@ def veritabani_kontrol():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 1. Vatandaşlar Tablosu
-        cursor.execute('''
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Tbl_Vatandaslar' and xtype='U')
-            CREATE TABLE Tbl_Vatandaslar (
-                TcKimlik VARCHAR(11) PRIMARY KEY,
-                Ad VARCHAR(50) NOT NULL,
-                Soyad VARCHAR(50) NOT NULL,
-                DogumTarihi VARCHAR(20) NOT NULL,
-                Telefon VARCHAR(15) NOT NULL,
-                Adres VARCHAR(255) NOT NULL
-            )
-        ''')
+        # SQLite için kontrol ve tablo oluşturma
+        if isinstance(conn, sqlite3.Connection):
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS Tbl_Vatandaslar (
+                    TcKimlik TEXT PRIMARY KEY,
+                    Ad TEXT NOT NULL,
+                    Soyad TEXT NOT NULL,
+                    DogumTarihi TEXT NOT NULL,
+                    Telefon TEXT NOT NULL,
+                    Adres TEXT NOT NULL
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS Tbl_Personel (
+                    PersonelTc TEXT PRIMARY KEY,
+                    Sifre TEXT NOT NULL
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS Tbl_Talepler (
+                    TalepID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    VatandasTc TEXT NOT NULL,
+                    AdSoyad TEXT NOT NULL,
+                    Telefon TEXT NOT NULL,
+                    Adres TEXT NOT NULL,
+                    Sikayet TEXT NOT NULL,
+                    DosyaAdi TEXT,
+                    Durum TEXT NOT NULL DEFAULT 'Bekliyor'
+                )
+            ''')
+        else:
+            # MS SQL Server için kontrol ve tablo oluşturma
+            cursor.execute('''
+                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Tbl_Vatandaslar' and xtype='U')
+                CREATE TABLE Tbl_Vatandaslar (
+                    TcKimlik VARCHAR(11) PRIMARY KEY,
+                    Ad VARCHAR(50) NOT NULL,
+                    Soyad VARCHAR(50) NOT NULL,
+                    DogumTarihi VARCHAR(20) NOT NULL,
+                    Telefon VARCHAR(15) NOT NULL,
+                    Adres VARCHAR(255) NOT NULL
+                )
+            ''')
 
-        # 2. Personel Tablosu
-        cursor.execute('''
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Tbl_Personel' and xtype='U')
-            CREATE TABLE Tbl_Personel (
-                PersonelTc VARCHAR(11) PRIMARY KEY,
-                Sifre VARCHAR(50) NOT NULL
-            )
-        ''')
+            cursor.execute('''
+                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Tbl_Personel' and xtype='U')
+                CREATE TABLE Tbl_Personel (
+                    PersonelTc VARCHAR(11) PRIMARY KEY,
+                    Sifre VARCHAR(50) NOT NULL
+                )
+            ''')
 
-        # 3. Talepler Tablosu
-        cursor.execute('''
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Tbl_Talepler' and xtype='U')
-            CREATE TABLE Tbl_Talepler (
-                TalepID INT IDENTITY(1,1) PRIMARY KEY,
-                VatandasTc VARCHAR(11) NOT NULL,
-                AdSoyad VARCHAR(100) NOT NULL,
-                Telefon VARCHAR(15) NOT NULL,
-                Adres VARCHAR(255) NOT NULL,
-                Sikayet VARCHAR(MAX) NOT NULL,
-                DosyaAdi VARCHAR(255),
-                Durum VARCHAR(20) NOT NULL DEFAULT 'Bekliyor'
-            )
-        ''')
-        
-        # Eğer tablo önceden var ama 'Adres' sütunu yoksa otomatik ekle
-        cursor.execute('''
-            IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tbl_Talepler') AND name = 'Adres')
-            ALTER TABLE Tbl_Talepler ADD Adres VARCHAR(255) NOT NULL DEFAULT 'Belirtilmedi'
-        ''')
-        
+            cursor.execute('''
+                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Tbl_Talepler' and xtype='U')
+                CREATE TABLE Tbl_Talepler (
+                    TalepID INT IDENTITY(1,1) PRIMARY KEY,
+                    VatandasTc VARCHAR(11) NOT NULL,
+                    AdSoyad VARCHAR(100) NOT NULL,
+                    Telefon VARCHAR(15) NOT NULL,
+                    Adres VARCHAR(255) NOT NULL,
+                    Sikayet VARCHAR(MAX) NOT NULL,
+                    DosyaAdi VARCHAR(255),
+                    Durum VARCHAR(20) NOT NULL DEFAULT 'Bekliyor'
+                )
+            ''')
+            
+            cursor.execute('''
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tbl_Talepler') AND name = 'Adres')
+                ALTER TABLE Tbl_Talepler ADD Adres VARCHAR(255) NOT NULL DEFAULT 'Belirtilmedi'
+            ''')
+            
         conn.commit()
         conn.close()
         print("Veritabanı ve tablo yapıları başarıyla doğrulandı.")
     except Exception as e:
         print(f"Veritabanı otomatik kurulum hatası: {e}")
+
+# Uygulama başladığında veritabanını doğrula (gunicorn için de hazır olur)
+veritabani_kontrol()
 
 # --- CAPTCHA (DOĞRULAMA KODU) FONKSİYONLARI ---
 def generate_captcha_text(length=5):
@@ -174,11 +223,13 @@ def basvuru_ekle():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute('''
-        IF NOT EXISTS (SELECT * FROM Tbl_Vatandaslar WHERE TcKimlik = ?)
-        INSERT INTO Tbl_Vatandaslar (TcKimlik, Ad, Soyad, DogumTarihi, Telefon, Adres) 
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (tc, tc, ad, soyad, dogum_tarihi, telefon, adres))
+    # Vatandaş kaydı yoksa ekle (Hem MSSQL hem SQLite uyumlu)
+    cursor.execute("SELECT 1 FROM Tbl_Vatandaslar WHERE TcKimlik = ?", (tc,))
+    if not cursor.fetchone():
+        cursor.execute('''
+            INSERT INTO Tbl_Vatandaslar (TcKimlik, Ad, Soyad, DogumTarihi, Telefon, Adres) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (tc, ad, soyad, dogum_tarihi, telefon, adres))
     
     ad_soyad = f"{ad} {soyad}"
     cursor.execute('''
